@@ -1,0 +1,17 @@
+FROM python:3.12-slim
+
+COPY .. /app
+WORKDIR /app
+
+RUN useradd -ms /bin/bash pipeuser
+USER pipeuser
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gcc build-essential \
+    && apt-get install -y --no-install-recommends gawk \
+    && apt-get install -y --no-install-recommends grep \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install -r requirements.txt \
+    && apt-get purge -y --auto-remove gcc build-essential
+
+CMD [ "python", "main.py" ]
