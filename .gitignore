@@ -1,0 +1,6 @@
+.idea/
+venv/
+app/.env
+DE-Challenge.pdf
+develop_notebook.ipynb
+pipeline*
