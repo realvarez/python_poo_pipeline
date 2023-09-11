@@ -29,4 +29,4 @@ if __name__ == "__main__":
     start_time = datetime.now()
     main()
     end_time = datetime.now()
-    logging.info(f"Time Execution: {start_time-end_time}")
+    logging.info(f"Time Execution: {end_time-start_time}")
