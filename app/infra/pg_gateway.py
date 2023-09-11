@@ -1,12 +1,12 @@
 import logging
-
+from typing import Iterator
 import pandas as pd
+from pandas import DataFrame
 from sqlalchemy import create_engine
 from app.infra import EnvConfig
 
 
 class MetaPGGateway(type):
-    _pg_credentials = EnvConfig.pg_credentials
     _engine_connection = None
 
     @property
@@ -17,13 +17,17 @@ class MetaPGGateway(type):
         return cls._engine_connection
 
     @property
+    def pg_credentials(cls) -> dict:
+        return EnvConfig.pg_credentials
+
+    @property
     def connection_string(cls) -> str:
         return "postgresql://{user}:{password}@{host}:{port}/{database}".format(
-            user=cls._pg_credentials.get("username"),
-            password=cls._pg_credentials.get("password"),
-            host=cls._pg_credentials.get("host"),
-            port=cls._pg_credentials.get("port"),
-            database=cls._pg_credentials.get("db")
+            user=cls.pg_credentials.get("username"),
+            password=cls.pg_credentials.get("password"),
+            host=cls.pg_credentials.get("host"),
+            port=cls.pg_credentials.get("port"),
+            database=cls.pg_credentials.get("db")
         )
 
 
@@ -36,13 +40,15 @@ class PGGateway(metaclass=MetaPGGateway):
             name=table,
             con=cls.engine_connection,
             dtype=columns_type,
-            replace=replace_table
+            index=False,
+            if_exists="replace" if replace_table else "append"
         )
         logging.info(f'Insert complete')
 
     @classmethod
-    def pd_select_table(cls, table_or_query: str):
+    def pd_select_table(cls, table_or_query: str, chunksize: int = 100) -> Iterator[DataFrame]:
         return pd.read_sql(
             sql=table_or_query,
-            con=cls.engine_connection
+            con=cls.engine_connection,
+            chunksize=chunksize
         )
