@@ -8,7 +8,7 @@ from app.utils import Constants
 
 class DataGenerator:
     def __init__(self):
-        self.fake = Faker()
+        self.fake = Faker("es-CL")
         self.seed = 0
         Faker.seed(self.seed)
 
@@ -20,7 +20,9 @@ class DataGenerator:
         data['email'] = [str(self.fake.email()) for _ in range(rows)]
         data['date_of_birth'] = [str(self.fake.date_of_birth(minimum_age=18, maximum_age=40)) for _ in range(rows)]
         data['address'] = [str(self.fake.address()) for _ in range(rows)]
-        data['purchase_amount'] = [str(self.fake.pricetag()) for _ in range(rows)]
+        data['purchase_amount'] = [
+            float(self.fake.pricetag().replace(u"$\xa0", "").replace(".", "")) for _ in range(rows)
+        ]
         data['last_purchase'] = [str(self.fake.date_between(start_date='-1y')) for _ in range(rows)]
         return data
 
