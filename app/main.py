@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, date
 from app.infra import EnvConfig
-from app.source import DataGenerator
+from app.source import DataGenerator, DataProcess
 from app.source import DataExtractor
 
 
@@ -12,17 +12,17 @@ def create_fake_data():
 
 
 def main():
-    today_date = date.today()
     logging.basicConfig(
-        filename=None,#f"pipeline{today_date}.log",
+        filename=None,
         format="%(asctime)s %(levelname)s:%(message)s",
         level=logging.DEBUG
     )
     EnvConfig()
     if EnvConfig.env.get('CREATE_DATA', True):
         create_fake_data()
-
+    print('0asd')
     data = DataExtractor.get_data_from_database(query_name='raw_data')
+    DataProcess.execute_process(data)
 
 
 if __name__ == "__main__":

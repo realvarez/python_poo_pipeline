@@ -6,6 +6,10 @@ from unicodedata import normalize
 
 import pandas as pd
 
+from app.infra import PGGateway
+from app.source import DataExtractor
+from app.utils import Constants
+
 
 class StringProcess:
 
@@ -33,7 +37,7 @@ class DateProcess:
     @staticmethod
     def verify_past_date(input_date) -> datetime.date | None:
         try:
-            _date = input_date.date()
+            _date = input_date
             today = datetime.date.today()
             if _date:
                 return _date if _date < today else today
@@ -85,3 +89,12 @@ class DataProcess:
         except KeyError as err:
             logging.error(f"Error in cleaning {err=}")
             exit()
+
+    @staticmethod
+    def execute_process(df: pd.DataFrame):
+        df = DataProcess.apply_cleaning(df)
+        PGGateway.pd_insert_sql(
+            table="cleaned_data",
+            df=df,
+            columns_type=Constants.SCHEMA_TYPE_CLEANED_TABLE
+        )

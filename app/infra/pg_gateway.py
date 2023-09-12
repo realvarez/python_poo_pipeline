@@ -8,11 +8,20 @@ from app.infra import EnvConfig
 
 class MetaPGGateway(type):
     _engine_connection = None
-
+    _engine_connection_stream = None
     @property
     def engine_connection(cls):
         if not cls._engine_connection:
             cls._engine_connection = create_engine(cls.connection_string)
+            logging.info("Created postgres engine")
+        return cls._engine_connection
+
+    @property
+    def engine_connection_stream(cls):
+        if not cls._engine_connection_stream:
+            cls._engine_connection_stream = create_engine(
+                cls.connection_string
+            ).connect().execution_options(stream_results=True)
             logging.info("Created postgres engine")
         return cls._engine_connection
 
@@ -46,9 +55,8 @@ class PGGateway(metaclass=MetaPGGateway):
         logging.info(f'Insert complete')
 
     @classmethod
-    def pd_select_table(cls, table_or_query: str, chunksize: int = 100) -> Iterator[DataFrame]:
+    def pd_select_table(cls, table_or_query: str) -> pd.DataFrame:
         return pd.read_sql(
             sql=table_or_query,
-            con=cls.engine_connection,
-            chunksize=chunksize
+            con=cls.engine_connection
         )

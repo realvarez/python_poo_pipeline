@@ -29,7 +29,7 @@ class MetaEnvConfig(type):
 
 
 class EnvConfig(metaclass=MetaEnvConfig):
-    def __new__(cls, env_file: str = '.env'):
+    def __new__(cls, env_file: str = './app/.env'):
         if not cls._initiated:
             logging.info('Initiating charge of environment variables')
             cls.env = env_file
