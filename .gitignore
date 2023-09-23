@@ -4,3 +4,4 @@ app/.env
 DE-Challenge.pdf
 develop_notebook.ipynb
 pipeline*
+__pycache__
