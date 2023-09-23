@@ -1,10 +1,7 @@
-FROM python:3.12-slim
+FROM python:3.11-slim
 
-COPY .. /app
+COPY . /app
 WORKDIR /app
-
-RUN useradd -ms /bin/bash pipeuser
-USER pipeuser
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gcc build-essential \
@@ -13,5 +10,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && pip install -r requirements.txt \
     && apt-get purge -y --auto-remove gcc build-essential
+
+RUN useradd -ms /bin/bash pipeuser
+USER pipeuser
 
 CMD [ "python", "main.py" ]
